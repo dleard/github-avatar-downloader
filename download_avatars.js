@@ -4,7 +4,10 @@ const fs = require('fs');
 
 console.log('Welcome to the GitHub Avatar Downloader');
 
-function getRepoContributors(repoOwner, repoName, cb) {
+function getRepoContributors(cb) {
+  const repoOwner = process.argv[2];
+  const repoName = process.argv[3];
+  if (!repoOwner || !repoName) return console.log('Invalid input. \n correct syntax: node download_avatars.js <repoOwner> <repoName>');
   const options = {
     url: 'https://api.github.com/repos/' + repoOwner + '/' + repoName + '/contributors',
     headers: {
@@ -27,7 +30,7 @@ function downloadImageByURL(url, filePath) {
     .pipe(fs.createWriteStream(filePath))
 }
 
-getRepoContributors("jquery", "jquery", function(err, result) {
+getRepoContributors(function(err, result) {
   if (err) console.log("Errors:", err);
   for (let i = 0; i < result.length; i++) {
     const filePath = 'avatars/' + result[i].login + '.jpg';
