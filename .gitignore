@@ -6,6 +6,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # Runtime data
+secrets.js
+
 pids
 *.pid
 *.seed
