@@ -14,6 +14,15 @@ function getRepoContributors(cb) {
   // takes repoOwner and repoName from command line
   const repoOwner = process.argv[2];
   const repoName = process.argv[3];
+  
+  if (!fs.existsSync('./.env')) {
+    return console.log('.env file missing \nsee https://github.com/motdotla/dotenv for details on configuring .env file.');
+  }
+
+  if (!process.env.GITHUB_TOKEN) {
+    return console.log('GITHUB_TOKEN variable missing from .env \nsee https://github.com/motdotla/dotenv for details on configuring .env file.');
+  }
+  
   if (!repoOwner || !repoName || process.argv.length !== 4) {
     return console.log('Invalid input. \n correct syntax: node download_avatars.js <repoOwner> <repoName>');
   }
@@ -26,7 +35,7 @@ function getRepoContributors(cb) {
   };
 
   request(options, function(err, res, body) {
-    if (res.headers.status !== '200 OK') return console.log('Repo not found');
+    if (res.headers.status !== '200 OK') { return console.log('Repo not found'); }
     bodyParsed = JSON.parse(body);
     cb(err, bodyParsed);
     
