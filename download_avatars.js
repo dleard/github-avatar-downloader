@@ -35,6 +35,9 @@ function getRepoContributors(cb) {
   };
 
   request(options, function(err, res, body) {
+    if (res.headers.status === '401 Unauthorized') {
+      return console.log('GITHUB_TOKEN is invalid \nCheck your token or reset here https://github.com/settings/tokens');
+    }
     if (res.headers.status !== '200 OK') { return console.log('Repo not found'); }
     bodyParsed = JSON.parse(body);
     cb(err, bodyParsed);
@@ -64,5 +67,5 @@ getRepoContributors(function(err, result) {
     const filePath = 'avatars/' + result[i].login + '.jpg';
     downloadImageByURL(result[i].avatar_url, filePath);
   }
-  if (result) { console.log('Images downloading'); }
+  if (result) { console.log('Images downloading to ./avatars/'); }
 });
