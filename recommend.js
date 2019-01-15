@@ -2,7 +2,6 @@ const request = require('request');
 require('dotenv').config();
 const fs = require('fs');
 
-console.log('Welcome to the GitHub Avatar Downloader');
 
 /**
   * @desc makes a request to provided repo, parses data and passes to callback function
@@ -46,29 +45,58 @@ function getRepoContributors(cb) {
   });
 }
 
-/**
-  * @desc pipes file from specified url and writes to specified file path
-  * @param string $url - the url to request from
-  * @param string $filePath - the path to write the file to
-  * @return void
-*/
+let starCount = {};
 
-function downloadImageByURL(url, filePath) {
-  request.get(url)
-    .on('error', function(error) {
-      throw error;
+function getMostStarred(err, result) {
+  if (err) { console.log("Errors:", err); }
+  
+  for (let i = 0; i < result.length; i++) {
+    let url = result[i].starred_url;
+    url = url.substr(0, url.length - 15);
+    
+    const options = {
+      url,
+      headers: {
+        'User-Agent': 'request',
+        'Authorization': 'token ' + process.env.GITHUB_TOKEN
+      }
+    };
+    
+    let dataString = '';
+    request(options)
+      .on('error', function(error) {
+        throw error
+      })
+      .on('data', function(data) {
+        dataString += data;
+      })
+      .on('end', function(data) {
+        const dataObject = JSON.parse(dataString);
+        for (key in dataObject) {
+          const repoName = dataObject[key].name;
+          if (Object.keys(starCount).includes(repoName)) starCount[repoName]++;
+          else starCount[repoName] = 1;
+        }
+      });
+  }
+  
+  setTimeout(wait, 2000);
+  
+  function wait() {
+    let starArray = []
+    for (key in starCount) {
+      starArray.push([key, starCount[key]]);
+    }
+    starArray = starArray.sort(function(a,b) {
+      return b[1] - a[1]; 
     })
-    .pipe(fs.createWriteStream(filePath));
+    console.log('Recommended Repos:\n')
+    for (let i = 0; i < 5; i++) console.log('[ ' + starArray[i][1] + ' stars ]\t' + starArray[i][0]);
+  }
 }
 
 getRepoContributors(function(err, result) {
   if (err) { console.log("Errors:", err); }
-  if (!fs.existsSync('./avatars')) { fs.mkdirSync('avatars'); }
-  for (let i = 0; i < result.length; i++) {
-    const filePath = 'avatars/' + result[i].login + '.jpg';
-    downloadImageByURL(result[i].avatar_url, filePath);
-  }
-  if (result) { console.log('Images downloading to ./avatars/'); }
+  getMostStarred(err, result);
+  
 });
-
-module.exports = {getRepoContributors}
