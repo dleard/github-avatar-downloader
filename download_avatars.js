@@ -26,8 +26,10 @@ function getRepoContributors(cb) {
   };
 
   request(options, function(err, res, body) {
+    if (res.headers.status !== '200 OK') return console.log('Repo not found');
     bodyParsed = JSON.parse(body);
     cb(err, bodyParsed);
+    
   });
 }
 
@@ -48,7 +50,7 @@ function downloadImageByURL(url, filePath) {
 
 getRepoContributors(function(err, result) {
   if (err) { console.log("Errors:", err); }
-  if (!fs.existsSync()) { fs.mkdirSync('avatars'); }
+  if (!fs.existsSync('./avatars')) { fs.mkdirSync('avatars'); }
   for (let i = 0; i < result.length; i++) {
     const filePath = 'avatars/' + result[i].login + '.jpg';
     downloadImageByURL(result[i].avatar_url, filePath);
