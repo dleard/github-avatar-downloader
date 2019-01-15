@@ -14,7 +14,9 @@ function getRepoContributors(cb) {
   // takes repoOwner and repoName from command line
   const repoOwner = process.argv[2];
   const repoName = process.argv[3];
-  if (!repoOwner || !repoName) { return console.log('Invalid input. \n correct syntax: node download_avatars.js <repoOwner> <repoName>'); }
+  if (!repoOwner || !repoName || process.argv.length !== 4) {
+    return console.log('Invalid input. \n correct syntax: node download_avatars.js <repoOwner> <repoName>');
+  }
   const options = {
     url: 'https://api.github.com/repos/' + repoOwner + '/' + repoName + '/contributors',
     headers: {
