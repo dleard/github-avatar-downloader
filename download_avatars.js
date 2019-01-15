@@ -4,7 +4,14 @@ const fs = require('fs');
 
 console.log('Welcome to the GitHub Avatar Downloader');
 
+/**
+  * @desc makes a request to provided repo, parses data and passes to callback function
+  * @param function $cb callback function
+  * @return void
+*/
+
 function getRepoContributors(cb) {
+  // takes repoOwner and repoName from command line
   const repoOwner = process.argv[2];
   const repoName = process.argv[3];
   if (!repoOwner || !repoName) { return console.log('Invalid input. \n correct syntax: node download_avatars.js <repoOwner> <repoName>'); }
@@ -21,6 +28,13 @@ function getRepoContributors(cb) {
     cb(err, bodyParsed);
   });
 }
+
+/**
+  * @desc pipes file from specified url and writes to specified file path
+  * @param string $url - the url to request from
+  * @param string $filePath - the path to write the file to
+  * @return void
+*/
 
 function downloadImageByURL(url, filePath) {
   request.get(url)
